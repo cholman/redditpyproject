@@ -1,4 +1,4 @@
-import pygame, time
+import pygame, time, random
 import terrain, sprites, biomes, movement
 from pygame.locals import *
 pygame.init()
@@ -24,11 +24,10 @@ mapsize = 24
 player = sprites.loadSprite("sprites/player.png")
 world = biomes.generateWorld(mapsize) #Problem with this atm - X's are diferent but not Y's...
 
-	
 
 
 pygame.display.flip()
-currentMap = (1, 1)
+currentMap = (23, random.randint(0, mapsize-1))
 currentX, currentY = currentMap
 terrain.drawMap(plains, mapsize, world[currentX][currentY], screen)
 pygame.display.flip()
@@ -63,18 +62,36 @@ while playgame == True: # Game loop
 		
 	#Ignore Just to select the current map
 	if anchorx >= width -40:
-		currentX+= 1
-		currentMap = (currentX, currentY)
-		playerCoords = (50, anchory)
-		terrain.drawMap(plains, mapsize, world[currentX][currentY], screen)
-		pygame.display.flip()
+		if currentX + 1 <= mapsize-1:
+			currentX+= 1
+			currentMap = (currentX, currentY)
+			playerCoords = (50, anchory)
+			terrain.drawMap(plains, mapsize, world[currentX][currentY], screen)
+			pygame.display.flip()
 		
 	if anchory >= height -40:
-		currentY+= 1
-		currentMap = (currentX, currentY)
-		playerCoords = (anchorx, 50)
-		terrain.drawMap(plains, mapsize, world[currentX][currentY], screen)
-		pygame.display.flip()
+		if currentY + 1 <= mapsize-1:
+			currentY+= 1
+			currentMap = (currentX, currentY)
+			playerCoords = (anchorx, 50)
+			terrain.drawMap(plains, mapsize, world[currentX][currentY], screen)
+			pygame.display.flip()
+		
+	if anchorx <= 5: # Grace 5 pix to let the player swap maps / Change later according to speed
+		if currentX - 1 >= 0:
+			currentX-= 1
+			currentMap = (currentX, currentY)
+			playerCoords = (width-41, anchory) # -k k has to be the same and up in >=
+			terrain.drawMap(plains, mapsize, world[currentX][currentY], screen)
+			pygame.display.flip()
+		
+	if anchory <= 5: # Grace 5 pix to let the player swap maps / Change later according to speed
+		if currentY - 1 >= 0:
+			currentY-= 1
+			currentMap = (currentX, currentY)
+			playerCoords = (anchorx, height-41) # -k k has to be the same and up in >=
+			terrain.drawMap(plains, mapsize, world[currentX][currentY], screen)
+			pygame.display.flip()
 	
 
 		
@@ -88,6 +105,5 @@ while playgame == True: # Game loop
 	Clock.tick(FPS)
 	pygame.display.set_caption(str(fps)+" "+str(currentX) +"|" + str(currentY))
 	#print(str(currentX)+str(currentY))
-	if world[0][1] == world[1][1]:
-		print('True')
+	
  # Test
