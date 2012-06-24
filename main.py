@@ -104,6 +104,5 @@ while playgame == True: # Game loop
 	fps = Clock.get_fps()
 	Clock.tick(FPS)
 	pygame.display.set_caption(str(fps)+" "+str(currentX) +"|" + str(currentY))
-	#print(str(currentX)+str(currentY))
 	
  # Test

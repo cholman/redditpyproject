@@ -3,7 +3,6 @@ import random
 # Plains (Grass, Water, Tree)
 
 def generateBiome(biomeType='plains', size=10, frequencies=[3, 1, 1]):
-	#print('gotcha')
 	biome = [['grass' for x in range(size)] for y in range(size)]
 	if biomeType == 'plains':
 		tiles = []
@@ -29,6 +28,4 @@ def generateWorld(mapsize):
 	for x in range(0, mapsize):
 		for y in range(0, mapsize):
 			world[x][y] = generateBiome('plains', mapsize, frequencies)
-			#print '\n the biome is ', world[x][y]
-			#print 'x is ', x, ' and y is ', y, '\n'
 	return world
