@@ -20,7 +20,7 @@ class loadSprite():
 		return rot_image
 	
 
-def calcAngleToMouse(mousex, mousey, anchor):
+def calcAngleToMouse((mousex, mousey), anchor):
 	x, y = anchor
 	mouseangle = 0
 	if x >= mousex:

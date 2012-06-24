@@ -1,0 +1,13 @@
+Added:
+Simple Firing System
+
+Removed:
+N/A
+
+Optimized:
+Map Drawing
+Updating objects in the screen
+Code ease-of-use
+
+To do:
+Optimize Firing system(add atk speed, better aim)

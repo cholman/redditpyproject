@@ -1,6 +1,6 @@
 import pygame, math
 from pygame.locals import *
-
+pygame.display.init()
 
 class loadTile():
 	'''This should be where the tile is processed into a pygame usable 
@@ -10,6 +10,13 @@ class loadTile():
 		self.sprite = pygame.image.load(tileImagePath).convert()
 		self.sprite.set_colorkey((255,0,255))
 		
+class biomes():
+	'''Contains all the biomes, which are the classes bellow, and each of the tiles in each biome'''
+	def __init__(self):
+		self.grass = loadTile("sprites/grass.png")
+		self.tree = loadTile("sprites/tree.png")
+		self.water = loadTile("sprites/water.png")	
+	
 
 def drawMap(tiles, mapsize, biome, screen):
 	for xtile in range(0, mapsize): # 
@@ -38,3 +45,6 @@ def updateMap(tiles, biome, screen, playerCoords):
 			if biome[xtile][ytile] == 'tree':
 				screen.blit(tiles.tree.sprite, (xtile*32, ytile*32))
 	
+
+def drawChunk(surface, chunk):
+	surface.blit(chunk, (0, 0))
