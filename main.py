@@ -126,7 +126,7 @@ class main():
 		if self.anchory <= 5: # Grace 5 pix to let the player swap maps / Change later according to speed
 			if self.currentY - 1 >= 0:
 				for idx, bullet in enumerate(self.bullets):
-					del bullets[idx]
+					del self.bullets[idx]
 				self.currentY-= 1
 				self.currentMap = (self.currentX, self.currentY)
 				self.playerCoords = (self.anchorx, self.height-41) # -k k has to be the same and up in >=
