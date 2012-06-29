@@ -16,7 +16,7 @@ class zombie:
 		self.angle = 0
 		self.inScreen = False
 		
-	def enemyAI(self, playerCoords, smellRange=10, chaseRange=11, walkSpeed=2, chaseSpeed=1):
+	def enemyAI(self, playerCoords, worldMap, smellRange=13, chaseRange=17, walkSpeed=2, chaseSpeed=2, mapsize=256):
 		playerX, playerY = playerCoords
 		# Determine wether the zombie should starting or stop chasing
 		if (((self.currentX - playerX))**2)+((self.currentY - playerY))**2 < (smellRange*32)**2:
@@ -25,25 +25,31 @@ class zombie:
 			self.chasingPlayer = False
 			
 		if self.chasingPlayer == True:
-			if self.currentX < playerX:
-				self.currentX += chaseSpeed
-			if self.currentY < playerY:
-				self.currentY += chaseSpeed
+			if self.currentX < playerX and self.currentX+chaseSpeed+32 < mapsize*32:
+				if worldMap[(self.currentX+32+chaseSpeed)/32][(self.currentY+16)/32] == 'grass':
+					self.currentX += chaseSpeed
+			if self.currentY < playerY and self.currentY+chaseSpeed+32 < mapsize*32:
+				if worldMap[(self.currentX+16)/32][(self.currentY+chaseSpeed+32)/32] == 'grass':
+					self.currentY += chaseSpeed
 			if self.currentX > playerX:
-				self.currentX -= chaseSpeed
+				if worldMap[(self.currentX-chaseSpeed)/32][(self.currentY+16)/32] == 'grass':
+					self.currentX -= chaseSpeed
 			if self.currentY > playerY:
-				self.currentY -= chaseSpeed
+				if worldMap[(self.currentX+16)/32][(self.currentY-chaseSpeed)/32] == 'grass':
+					self.currentY -= chaseSpeed
 		anchorX, anchorY = (playerX-768/2, playerY-768/2)
 		self.inScreen = False
+		self.angle = sprites.calcAngleToMouse((playerX, playerY), (self.currentX, self.currentY))
+		self.sprite.spriteRot = self.sprite.rotCenter(self.angle)
 		
-		if 0 < self.currentX - anchorX < 768-32 and 0 < self.currentY - anchorY < 768-32:
+		if -32 < self.currentX - anchorX < 768 and -32 < self.currentY - anchorY < 768:
 			self.inScreen = True
 			self.inScreenX = self.currentX - anchorX
 			self.inScreenY = self.currentY - anchorY
 			
 	def update(self, surface):
 		if self.inScreen == True:
-			surface.blit(self.sprite.sprite, (self.inScreenX, self.inScreenY))
+			surface.blit(self.sprite.spriteRot, (self.inScreenX, self.inScreenY))
 		#elif self.chasingPlayer == False:
 			#self.currentX += random.randint(0, walkSpeed)
 			#self.currentY += random.randint(0, walkSpeed)

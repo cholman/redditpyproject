@@ -1,26 +1,38 @@
-import pygame
+import pygame, random
 from pygame.locals import *
 
 
-def movePlayer(coords, mapsize, speed=3, screenxy=(768, 768)):
+def movePlayer(coords, mapsize, worldMap, speed=3, screenxy=(768, 768)):
 	playerX, playerY = coords
 	screenX, screenY = screenxy
 	keys = pygame.key.get_pressed()
 	
 	if keys[pygame.K_w]:
 		if playerY > 0:
-			playerY -= speed
+			if worldMap[(playerX+16)/32][(playerY-speed)/32] == 'grass':
+				playerY -= speed
 	if keys[pygame.K_s]:
 		if playerY < 32*(mapsize-1):
-			playerY += speed
+			if playerY+speed+32 < mapsize*32:
+				if worldMap[(playerX+16)/32][(playerY+speed+32)/32] == 'grass':
+					playerY += speed
 	if keys[pygame.K_d]:
 		if playerX < 32*(mapsize-1):
-			playerX += speed
+			if playerX+speed+32 < mapsize*32:
+				if worldMap[(playerX+speed+32)/32][(playerY+16)/32] == 'grass':
+					playerX += speed
 	elif keys[pygame.K_a]:
 		if playerX > 0:
-			playerX -= speed
+			if worldMap[(playerX-speed)/32][(playerY+16)/32] == 'grass':
+				playerX -= speed
 		
 		
 	newCoords = (playerX, playerY)
 	return newCoords
 		
+def generateLocation(world, mapsize):
+	locX, locY = (random.randint(0,(mapsize-1)*32),random.randint(0,(mapsize-1)*32))
+	while world[locX/32][locY/32] != 'grass':
+		locX, locY = (random.randint(0,(mapsize-1)*32),random.randint(0,(mapsize-1)*32))
+
+	return (locX, locY)

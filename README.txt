@@ -1,15 +1,18 @@
 	
 	CHANGELOG:
 		Added Features:
-		Node based lakes/forests
-		Camera now locks on the player
+		Colision
+		Zombie Sprite Rotation
 
 		Removed Features:
-		Infinite World (Now a limited 256*256 tile map) - still random
+		N/A
 
 		Optimized:
-		Map Drawing
-		Map Generation
+		Zombie Chasing - No pathfinding yet.
+		Player Spawning - Wont spawn on non walkable tile.
 
 		Next Priorities:
-		Colision
+		Better zombie pathfinding
+		Acceleration
+		Zombie/Player Fighting
+		Zombie Spawning during game.

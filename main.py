@@ -39,8 +39,8 @@ class main():
 		self.mapsize = 256																			# Determines the number of chunks per map side (mapsize*mapsize) is the world's number of tiles :: (Changeable)
 		self.world = biomes.generateMap() 															# Generate a new world :: (Mapsize veriable is changeable, but not this)
 		self.currentChunk = pygame.Surface((32*self.mapsize, 32*self.mapsize))					    # Create the surface where the chunk tiles being displayed will be stored :: (Not changeable)
-		self.playerCoords = (random.randint(0,self.mapsize*32), random.randint(0,self.mapsize*32))			# Sets the initial player coordinate :: (Changeable, aslong as they are within the limits)
-		self.zombie = enemy.zombie((random.randint(0,self.mapsize*32), random.randint(0,self.mapsize*32)))#self.playerCoords)
+		self.playerCoords = movement.generateLocation(self.world, self.mapsize)			# Sets the initial player coordinate :: (Changeable, aslong as they are within the limits)
+		self.zombie = enemy.zombie(movement.generateLocation(self.world, self.mapsize))#self.playerCoords)
 		self.biomes = terrain.biomes()																# The list of available types of biomes
 		self.bullets = []																			# Set up a list that will contain the bullets
 		self.zombies = []
@@ -56,8 +56,8 @@ class main():
 	def updateIngame(self):
 		self.screen.fill((0,0,0))
 		self.anchorx, self.anchory = self.playerCoords
-		self.zombie.enemyAI(self.playerCoords)
-		self.playerCoords = movement.movePlayer(self.playerCoords, self.mapsize)
+		self.zombie.enemyAI(self.playerCoords, self.world)
+		self.playerCoords = movement.movePlayer(self.playerCoords, self.mapsize, self.world)
 		terrain.drawMap(self.screen, self.currentChunk, self.playerCoords)
 		self.mouseangle = sprites.calcAngleToMouse(self.mouseCoords, self.midCoords)
 		
