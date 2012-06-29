@@ -18,33 +18,19 @@ class biomes():
 		self.water = loadTile("sprites/water.png")	
 	
 
-def drawMap(tiles, mapsize, biome, screen):
+def blitMap(tiles, mapsize, chunk, screen):
 	for xtile in range(0, mapsize): # 
 		for ytile in range(0, mapsize):
-			if biome[xtile][ytile] == 'grass':
+			if chunk[xtile][ytile] == 'grass':
 				screen.blit(tiles.grass.sprite, (xtile*32, ytile*32))
 			
-			if biome[xtile][ytile] == 'water':
+			if chunk[xtile][ytile] == 'water':
 				screen.blit(tiles.water.sprite, (xtile*32, ytile*32))
 				
-			if biome[xtile][ytile] == 'tree':
+			if chunk[xtile][ytile] == 'tree':
 				screen.blit(tiles.tree.sprite, (xtile*32, ytile*32))
-			
-def updateMap(tiles, biome, screen, playerCoords):
-	playerX, playerY = playerCoords
-	tileX = (playerX-(playerX%32))/32
-	tileY = (playerY-(playerY%32))/32
-	for xtile in range(tileX-2, tileX+2): # 
-		for ytile in range(tileY-2, tileY+2):
-			if biome[xtile][ytile] == 'grass':
-				screen.blit(tiles.grass.sprite, (xtile*32, ytile*32))
-			
-			if biome[xtile][ytile] == 'water':
-				screen.blit(tiles.water.sprite, (xtile*32, ytile*32))
-				
-			if biome[xtile][ytile] == 'tree':
-				screen.blit(tiles.tree.sprite, (xtile*32, ytile*32))
-	
 
-def drawChunk(surface, chunk):
-	surface.blit(chunk, (0, 0))
+				
+def drawMap(surface, chunk, playerCoords):
+	playerX, playerY = playerCoords
+	surface.blit(chunk, (0-playerX+384, 0-playerY+384))

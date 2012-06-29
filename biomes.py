@@ -1,32 +1,33 @@
 import random
 # Plains (Grass, Water, Tree)
 
-def generateBiome(biomeType='plains', size=10, frequencies=[3, 1, 1]):
+def generateMap(biomeType='plains', size=256, frequencies=2, nodeSize=5):
 	biome = [['grass' for x in range(size)] for y in range(size)]
-	if biomeType == 'plains':
-		tiles = []
-		if frequencies[0] != 0:
-			for times in range(0, frequencies[0]):
-				tiles.append('grass')
-				
-		if frequencies[1] != 0:
-			for times in range(0, frequencies[1]):
-				tiles.append('water')
-				
-		if frequencies[2] != 0:
-			for times in range(0, frequencies[2]):
-				tiles.append('tree')
-				
-		for x in range (0, size):
-			for y in range (0, size):
-				biome[x][y] = tiles[random.randint(0,len(tiles)-1)]
-
-	return biome
+	
 		
-def generateWorld(mapsize, biomesize):
-	world = [[None for x in range(mapsize)] for y in range(mapsize)]
-	frequencies = [5, 1, 3]
-	for x in range(0, mapsize):
-		for y in range(0, mapsize):
-			world[x][y] = generateBiome('plains', mapsize, frequencies)
-	return world
+	for times in range (0, ((size/24)**2)*frequencies): # Place the water fountains which will be the center of each lake
+		x = random.randint(nodeSize, size-nodeSize)
+		y = random.randint(nodeSize, size-nodeSize)
+		biome[x][y] = 'waterSource'
+		
+	for times in range (0, ((size/24)**2)*frequencies): # Place the tree which will be the center of each forest
+		x = random.randint(nodeSize, size-nodeSize)
+		y = random.randint(nodeSize, size-nodeSize)
+		biome[x][y] = 'forestSource'
+		
+	biomeCopy = biome
+	
+	for x in range (0, size-1):
+		for y in range (0, size-1):
+			if biome[x][y] == 'waterSource':
+				for idX in range(-nodeSize, nodeSize):
+					for idY in range(-nodeSize, nodeSize):
+						if ((idX)**2)+((idY)**2) < nodeSize**2:
+							biome[x-idX][y-idY] = 'water'
+			if biome[x][y] == 'forestSource':
+				for idX in range(-nodeSize, nodeSize):
+					for idY in range(-nodeSize, nodeSize):
+						if ((idX)**2)+((idY)**2) < nodeSize**2:
+							biome[x-idX][y-idY] = 'tree'
+							
+	return biomeCopy

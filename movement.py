@@ -2,25 +2,24 @@ import pygame
 from pygame.locals import *
 
 
-def movePlayer(coords, speed=2, screenxy=(768, 768)):
+def movePlayer(coords, mapsize, speed=2, screenxy=(768, 768)):
 	playerX, playerY = coords
 	screenX, screenY = screenxy
 	keys = pygame.key.get_pressed()
 	
 	if keys[pygame.K_w]:
-		playerY -= speed
+		if playerY > 0:
+			playerY -= speed
 	if keys[pygame.K_s]:
-		playerY += speed
-	if keys[pygame.K_a]:
-		playerX -= speed
-	elif keys[pygame.K_d]:
-		playerX += speed
+		if playerY < 32*(mapsize-1):
+			playerY += speed
+	if keys[pygame.K_d]:
+		if playerX < 32*(mapsize-1):
+			playerX += speed
+	elif keys[pygame.K_a]:
+		if playerX > 0:
+			playerX -= speed
 		
-	if playerX >= screenX - 32 or playerX <= 0:
-		playerX, playerY = coords
-	
-	if playerY >= screenY - 32 or playerY <= 0:
-		playerX, playerY = coords
 		
 	newCoords = (playerX, playerY)
 	return newCoords
