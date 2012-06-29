@@ -24,13 +24,12 @@ def calcAngleToMouse((mousex, mousey), anchor):
 	x, y = anchor
 	mouseangle = 0
 	if x >= mousex:
-		mouseangle = math.degrees(math.atan2((mousey - y), (x - mousex)) / math.pi * 2.0)
-            
+		mouseangle = math.degrees(float(math.atan2((mousey - y), (x - mousex))))
+   	
 	if x < mousex:
-		mouseangle = math.degrees(math.atan2((mousey - y), (x - mousex)) / math.pi * 3.0)
-		
-	if mouseangle > 360:
-		moueangle = mouseangle - 360
+		mouseangle = math.degrees(float(math.atan2((mousey - y), (x - mousex))))
 		
 	mouseangle += 90
 	return mouseangle
+	
+
