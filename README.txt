@@ -1,18 +1,15 @@
 	
 	CHANGELOG:
-		Added Features:
-		Colision
-		Zombie Sprite Rotation
+		Zombies now spawn overtime acording to a variable.
 
 		Removed Features:
 		N/A
 
 		Optimized:
-		Zombie Chasing - No pathfinding yet.
-		Player Spawning - Wont spawn on non walkable tile.
+		N/A
 
 		Next Priorities:
 		Better zombie pathfinding
 		Acceleration
 		Zombie/Player Fighting
-		Zombie Spawning during game.
+		

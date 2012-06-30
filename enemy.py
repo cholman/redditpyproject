@@ -1,5 +1,5 @@
 import pygame
-import random, math, sprites
+import random, math, sprites, time, movement
 from pygame.locals import *
 
 # calculate sin and cos to increase speed
@@ -7,14 +7,16 @@ SINTABLE = [math.sin(math.radians(angle)) for angle in xrange(360)]
 COSTABLE = [math.cos(math.radians(angle)) for angle in xrange(360)]
 
 
+
+# Control Something based on time (do a task every N seconds)
 class zombie:
-	def __init__(self, (initialX, initialY)):
+	def __init__(self, world, mapsize):
 		self.sprite = sprites.loadSprite("sprites/zombie.png")
-		self.currentX = initialX
-		self.currentY = initialY
+		self.currentX, self.currentY = movement.generateLocation(world, mapsize)
 		self.chasingPlayer = False
 		self.angle = 0
 		self.inScreen = False
+		
 		
 	def enemyAI(self, playerCoords, worldMap, smellRange=13, chaseRange=17, walkSpeed=2, chaseSpeed=2, mapsize=256):
 		playerX, playerY = playerCoords

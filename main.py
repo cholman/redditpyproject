@@ -1,5 +1,5 @@
 import pygame, time, random
-import terrain, sprites, biomes, movement, projectiles, enemy, math
+import terrain, sprites, biomes, movement, projectiles, enemy, math, timedevents
 from pygame.locals import *
 pygame.display.init()
 
@@ -40,7 +40,9 @@ class main():
 		self.world = biomes.generateMap() 															# Generate a new world :: (Mapsize veriable is changeable, but not this)
 		self.currentChunk = pygame.Surface((32*self.mapsize, 32*self.mapsize))					    # Create the surface where the chunk tiles being displayed will be stored :: (Not changeable)
 		self.playerCoords = movement.generateLocation(self.world, self.mapsize)			# Sets the initial player coordinate :: (Changeable, aslong as they are within the limits)
-		self.zombie = enemy.zombie(movement.generateLocation(self.world, self.mapsize))#self.playerCoords)
+		self.zombieSpawner = timedevents.vars(2)
+		self.zombieSpawner.doFunction(enemy.zombie, self.world, self.mapsize)
+		#self.zombie = enemy.zombie(movement.generateLocation(self.world, self.mapsize))#self.playerCoords)
 		self.biomes = terrain.biomes()																# The list of available types of biomes
 		self.bullets = []																			# Set up a list that will contain the bullets
 		self.zombies = []
@@ -54,9 +56,13 @@ class main():
 		
 
 	def updateIngame(self):
+	
+		if  self.zombieSpawner.determineTF() == True and len(self.zombies) < 50:
+			self.zombies.append(self.zombieSpawner.doFunction(enemy.zombie, self.world, self.mapsize))
 		self.screen.fill((0,0,0))
 		self.anchorx, self.anchory = self.playerCoords
-		self.zombie.enemyAI(self.playerCoords, self.world)
+		for zombie in self.zombies:
+			zombie.enemyAI(self.playerCoords, self.world)
 		self.playerCoords = movement.movePlayer(self.playerCoords, self.mapsize, self.world)
 		terrain.drawMap(self.screen, self.currentChunk, self.playerCoords)
 		self.mouseangle = sprites.calcAngleToMouse(self.mouseCoords, self.midCoords)
@@ -107,12 +113,13 @@ class main():
 		for bullet in self.bullets:
 			bullet.update(self.bullImage.sprite, self.screen)	
 		self.screen.blit(self.newplayer, self.midCoords)
-		self.zombie.update(self.screen)
+		for zombie in self.zombies:
+			zombie.update(self.screen)
 		self.screen.blit(self.currentUI, (768, 0))
 		self.fps = self.Clock.get_fps()
 		self.Clock.tick(self.FPS)
 		playerX, playerY = self.playerCoords
-		caption = 'Fps: ' + str(math.floor(self.fps)) + ' | Player:(' + str(playerX/32) + ',' + str(playerY/32) + ')  | Zombie:(' + str(self.zombie.currentX/32) + ',' + str(self.zombie.currentY/32) + ') |  Chasing: ' + str(self.zombie.chasingPlayer)
+		caption = 'Fps: ' + str(math.floor(self.fps)) + ' | Player:(' + str(playerX/32) + ',' + str(playerY/32) + ')  | ZombieCount ' + str(len(self.zombies))
 		pygame.display.set_caption(caption)
 		pygame.display.flip()
 	
