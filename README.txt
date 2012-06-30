@@ -1,15 +1,18 @@
 	
 	CHANGELOG:
-		Zombies now spawn overtime acording to a variable.
+		Firing AttackSpeed
+		Timed Events
 
 		Removed Features:
 		N/A
 
 		Optimized:
-		N/A
+		Bullets Were based on the screen and not on the map, this is now fixed.
 
 		Next Priorities:
+		Zombie/Player Fighting # Working on this.
+		UI
 		Better zombie pathfinding
 		Acceleration
-		Zombie/Player Fighting
+		
 		

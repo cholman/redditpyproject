@@ -16,6 +16,7 @@ class zombie:
 		self.chasingPlayer = False
 		self.angle = 0
 		self.inScreen = False
+		self.health = 50
 		
 		
 	def enemyAI(self, playerCoords, worldMap, smellRange=13, chaseRange=17, walkSpeed=2, chaseSpeed=2, mapsize=256):
@@ -45,21 +46,13 @@ class zombie:
 		self.sprite.spriteRot = self.sprite.rotCenter(self.angle)
 		
 		if -32 < self.currentX - anchorX < 768 and -32 < self.currentY - anchorY < 768:
-			self.inScreen = True
 			self.inScreenX = self.currentX - anchorX
 			self.inScreenY = self.currentY - anchorY
+			self.inScreen = True
 			
 	def update(self, surface):
 		if self.inScreen == True:
 			surface.blit(self.sprite.spriteRot, (self.inScreenX, self.inScreenY))
-		#elif self.chasingPlayer == False:
-			#self.currentX += random.randint(0, walkSpeed)
-			#self.currentY += random.randint(0, walkSpeed)
-			
-		#1. Check if player is nearby
-		#2. If player in "smell"-range, track player posistion and move against player
-		#3. If player is out of "chase"-range, stop tracking player
-		#4. If not trackning player, move randomly or stay still
 		
 		
 		
