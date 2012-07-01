@@ -1,5 +1,5 @@
 import pygame, time, random, sys
-import terrain, sprites, biomes, movement, projectiles, enemy, math, timedevents, player
+import terrain, sprites, biomes, movement, projectiles, enemy, math, timedevents, player, fonts
 from pygame.locals import *
 pygame.display.init()
 
@@ -13,18 +13,20 @@ class main():
 		self.screen = pygame.display.set_mode((self.width,self.height), RESIZABLE)						    # Setting up the window where the game will be displayed :: (Not changeable)
 		self.gamestate = 'ingame' 																	# Determines in what game state the client starts
 		self.mouseCoords = pygame.mouse.get_pos()													# Determines the initial mouse coordinates
-		self.FPS = 75																					# Determines the max FPS the client can achieve :: (No point going over the screen refresh rate, but changeable)
+		self.FPS = 100																					# Determines the max FPS the client can achieve :: (No point going over the screen refresh rate, but changeable)
 		self.bullImage = sprites.loadSprite("sprites/bullet.png")
 		
 		
 		
 		
 	# Loading Functions :: Where the starting objects should be loaded.	
-	def loadFont(self)
+		
 	def loadUI(self):
+		self.fonts = fonts.UI()
 		self.currentUI = pygame.Surface((200, 768))	
 		self.uiBackground = sprites.loadSprite("sprites/uibackground.png")
 		self.currentUI.blit(self.uiBackground.sprite, (0,0))
+		
 		
 	def loadWorld(self):
 		'''Load the game's world'''
@@ -43,6 +45,7 @@ class main():
 		self.midCoords = ((self.width-200)/2, self.height/2)
 		pygame.display.flip()
 		self.firingTimer = timedevents.vars(0.2)
+
 		
 		
 		
@@ -52,7 +55,6 @@ class main():
 	# Updating Funtions :: Where the update of each seperate game component should be updated (UI, AI'S)
 	
 	def updateIngame(self):
-	
 		if  self.zombieSpawner.determineTF() and len(self.zombies) < 50:
 			self.zombies.append(self.zombieSpawner.doFunction(enemy.zombie, self.world, self.mapsize))
 		self.screen.fill((0,0,0))
@@ -60,6 +62,7 @@ class main():
 		for zombie in self.zombies:
 			zombie.enemyAI(self.player.playerCoords, self.world)
 		self.player.playerCoords = movement.movePlayer(self.player.playerCoords, self.mapsize, self.world)
+		self.player.currentX, self.player.currentY = self.player.playerCoords
 		terrain.drawMap(self.screen, self.currentChunk, self.player.playerCoords)
 		self.mouseangle = sprites.calcAngleToMouse(self.mouseCoords, self.midCoords)
 		
@@ -83,29 +86,54 @@ class main():
 			if self.firingTimer.determineTF():
 				self.bullets.append(projectiles.Bullet(self.player.playerCoords, self.mouseangle))
 		
-
 		for bullet in self.bullets:
-			bullet.update(self.screen, self.player.playerCoords)		
-			
+			bullet.update(self.screen, self.player.playerCoords)	
+
 		for idx, bullet in enumerate(self.bullets):
+			for idxZ, zombie in enumerate(self.zombies):
+				if movement.colision(zombie, 16, bullet, 3, 18):
+					self.zombies[idxZ].health -= 25
+					self.player.lastHit = idxZ
+					if self.zombies[idxZ].health <= 0:
+						del self.zombies[idxZ]
+						self.player.lastHit = -1
+					del self.bullets[idx]
+					continue
 			if bullet.inScreen == False:
 				del self.bullets[idx]
-
 		
+		self.player.update()
 
 		self.screen.blit(self.newplayer, self.midCoords)
-		for zombie in self.zombies:
+		for idx, zombie in enumerate(self.zombies):
 			zombie.update(self.screen)
+			if movement.colision(zombie, 16, self.player, 0, 32):
+				if zombie.attackSpeed.determineTF():
+					self.player.health -= 50
+					if self.player.health <= 0:
+						self.gamestate = 'dead'
 		self.screen.blit(self.currentUI, (768, 0))
 		self.fps = self.Clock.get_fps()
 		self.Clock.tick(self.FPS)
-		caption = 'Fps: ' + str(math.floor(self.fps)) + ' | Player:(' + str(self.anchorx/32) + ',' + str(self.anchory/32) + ')  | ZombieCount ' + str(len(self.zombies)) + ' | Firing speed: ' + str(self.firingTimer.seconds)
+		caption = 'Fps: ' + str(math.floor(self.fps)) + ' | Player:(' + str(self.player.currentX/32) + ',' + str(self.player.currentY/32) + ')  | ZombieCount ' + str(len(self.zombies)) + ' | Firing speed: ' + str(self.firingTimer.seconds)
 		pygame.display.set_caption(caption)
 		pygame.display.flip()
 	
 	def updateUI(self):
-		pass
-
+		if self.player.lastHit != -1:
+			self.currentUI.blit(self.zombies[self.player.lastHit].hpBar, (50, 75))
+		elif self.player.lastHit == -1:
+			self.currentUI.blit(self.fonts.images['notar'], (50, 75))
+		self.currentUI.blit(self.player.hpBar, (50, 35))
+		self.currentUI.blit(self.fonts.images['hp'], (50, 10))
+		self.currentUI.blit(self.fonts.images['tar'], (65, 50))
+	
+	def deadScreen(self):
+		self.screen.fill((255,0,0))
+		self.screen.blit(self.fonts.images['dead'], (self.width/2-300, self.height/2-10))
+		pygame.display.flip()
+		time.sleep(5)
+		self.gamestate = 'ingame'
 
 		
 		
@@ -115,11 +143,14 @@ class main():
 # Game Sequence / Loop:
 		
 game = main()
-if game.gamestate == 'ingame':
+while game.gamestate == 'ingame':
 	game.loadUI()
 	game.loadWorld()
 	
 	
 	while game.gamestate == 'ingame':
 		game.updateIngame()
+		game.updateUI()
 		
+	if game.gamestate == 'dead':
+		game.deadScreen()

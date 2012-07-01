@@ -33,6 +33,12 @@ def movePlayer(coords, mapsize, worldMap, speed=3, screenxy=(768, 768)):
 def generateLocation(world, mapsize):
 	locX, locY = (random.randint(0,(mapsize-1)*32),random.randint(0,(mapsize-1)*32))
 	while world[locX/32][locY/32] != 'grass':
-		locX, locY = (random.randint(0,(mapsize-1)*32),random.randint(0,(mapsize-1)*32))
+		locX, locY = (random.randint(0,(mapsize-1)*32-16),random.randint(0,(mapsize-1)*32-16))
 
 	return (locX, locY)
+	
+def colision(obj1, obj1Mid, obj2, obj2Mid, range):
+	if (((obj1.currentX + obj1Mid - obj2.currentX + obj2Mid))**2)+((obj1.currentY +obj1Mid - obj2.currentY + obj2Mid))**2 <= (range)**2:
+		return True
+	else:
+		return False

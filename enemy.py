@@ -1,5 +1,5 @@
 import pygame
-import random, math, sprites, time, movement
+import random, math, sprites, time, movement, timedevents
 from pygame.locals import *
 
 # calculate sin and cos to increase speed
@@ -16,7 +16,10 @@ class zombie:
 		self.chasingPlayer = False
 		self.angle = 0
 		self.inScreen = False
-		self.health = 50
+		self.health = 100
+		self.hpBar = pygame.Surface((100, 10))
+		pygame.draw.rect(self.hpBar, (255, 0, 0), (-1, 0, self.health, 10))
+		self.attackSpeed = timedevents.vars(1)
 		
 		
 	def enemyAI(self, playerCoords, worldMap, smellRange=13, chaseRange=17, walkSpeed=2, chaseSpeed=2, mapsize=256):
@@ -53,6 +56,8 @@ class zombie:
 	def update(self, surface):
 		if self.inScreen == True:
 			surface.blit(self.sprite.spriteRot, (self.inScreenX, self.inScreenY))
+		self.hpBar.fill((0,0,0))
+		pygame.draw.rect(self.hpBar, (255, 0, 0), (-1, 0, self.health, 10))
 		
 		
 		
