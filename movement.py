@@ -2,7 +2,7 @@ import pygame, random
 from pygame.locals import *
 
 
-def movePlayer(coords, mapsize, worldMap, speed=3, screenxy=(768, 768)):
+def movePlayer(coords, mapsize, worldMap, speed=2, screenxy=(768, 768)):
 	playerX, playerY = coords
 	screenX, screenY = screenxy
 	keys = pygame.key.get_pressed()
