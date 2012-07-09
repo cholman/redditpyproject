@@ -1,2 +1,0 @@
-python terrain.py
-PAUSE

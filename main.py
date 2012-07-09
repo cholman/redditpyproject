@@ -13,9 +13,12 @@ class main():
 		self.screen = pygame.display.set_mode((self.width,self.height), RESIZABLE)						    # Setting up the window where the game will be displayed :: (Not changeable)
 		self.gamestate = 'ingame' 																	# Determines in what game state the client starts
 		self.mouseCoords = pygame.mouse.get_pos()													# Determines the initial mouse coordinates
-		self.FPS = 100																					# Determines the max FPS the client can achieve :: (No point going over the screen refresh rate, but changeable)
+		self.FPS = 250																					# Determines the max FPS the client can achieve :: (No point going over the screen refresh rate, but changeable)
 		self.bullImage = sprites.loadSprite("sprites/bullet.png")
 		self.yetiImage = sprites.loadSprite("sprites/zombie.png")
+		self.lastTick = time.time()
+		self.currentTime = time.time()
+		self.deltaTick = 1 / float(70)
 		
 		
 		
@@ -55,19 +58,17 @@ class main():
 		
 		
 	# Updating Funtions :: Where the update of each seperate game component should be updated (UI, AI'S)
-	
-	def updateIngame(self):
+	def updateLogic(self):
 		if  self.zombieSpawner.determineTF() and len(self.zombies) < 50:
 			self.zombies.append(self.zombieSpawner.doFunction(enemy.zombie, self.world, self.mapsize, self.yetiImage))
-		self.screen.fill((0,0,0))
+			
 		self.anchorx, self.anchory = self.player.playerCoords
+		
 		for zombie in self.zombies:
 			zombie.enemyAI(self.player.playerCoords, self.world)
+			
 		self.player.playerCoords = movement.movePlayer(self.player.playerCoords, self.mapsize, self.world)
 		self.player.currentX, self.player.currentY = self.player.playerCoords
-		terrain.drawMap(self.screen, self.currentChunk, self.player.playerCoords)
-		self.mouseangle = sprites.calcAngleToMouse(self.mouseCoords, self.midCoords)
-		
 		
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
@@ -79,51 +80,60 @@ class main():
 					
 			elif event.type == MOUSEMOTION:
 				self.mouseCoords = event.pos
-						
-		self.newplayer = self.player.sprite.rotCenter(self.mouseangle)
-			
-		self.keys = pygame.key.get_pressed()
+		
 		(button1, button2, button3) = pygame.mouse.get_pressed()
 		if button1 == 1:
 			if self.firingTimer.determineTF():
-				self.bullets.append(projectiles.Bullet(self.player.playerCoords, self.mouseangle))
+				self.bullets.append(projectiles.Bullet(self.player.playerCoords))
 		if button2 == 1:
 			self.player.playerCoords = self.zombies[0].currentX, self.zombies[0].currentY
-		for bullet in self.bullets:
-			bullet.update(self.screen, self.player.playerCoords)	
-
+			
 		for idx, bullet in enumerate(self.bullets):
+			bullet.update(self.player.playerCoords, self.mouseCoords)
+			if bullet.inScreen == False:
+					del self.bullets[idx]
+					break
 			for idxZ, zombie in enumerate(self.zombies):
-				if bullet.inScreen == False:
-					del self.bullets[idx]
-					break
-				if movement.colision(zombie, 16, bullet, 3, 18):
-					self.zombies[idxZ].health -= 25
-					self.player.lastHit = idxZ
-					if self.zombies[idxZ].health <= 0:
-						del self.zombies[idxZ]
-						self.player.lastHit = -1
-					del self.bullets[idx]
-					break
+				if self.zombies[idxZ].inScreen == True:
+					if movement.colision(zombie, 16, bullet, 3, 18):
+						self.zombies[idxZ].health -= 25
+						self.player.lastHit = idxZ
+						if self.zombies[idxZ].health <= 0:
+							del self.zombies[idxZ]
+							self.player.lastHit = -1
+						del self.bullets[idx]
+						break
 					
-
-		
-		self.player.update()
-
-		self.screen.blit(self.newplayer, self.midCoords)
 		for idx, zombie in enumerate(self.zombies):
-			zombie.update(self.screen)
+			zombie.update()
 			if movement.colision(zombie, 16, self.player, 0, 32):
 				if zombie.attackSpeed.determineTF():
 					self.player.health -= 5
 					if self.player.health <= 0:
 						self.gamestate = 'dead'
+		
+	def updateRender(self):
+		self.screen.fill((0,0,0))
+		terrain.drawMap(self.screen, self.currentChunk, self.player.playerCoords)
+		self.mouseangle = sprites.calcAngleToMouse(self.mouseCoords, self.midCoords)
+		self.newplayer = self.player.sprite.rotCenter(self.mouseangle)
+		
+
+		for bullet in self.bullets:
+			bullet.draw(self.screen)	
+
+		
+		self.player.update()
+		for idx, zombie in enumerate(self.zombies):
+			zombie.draw(self.screen)
+		self.screen.blit(self.newplayer, self.midCoords)
+		
 		self.screen.blit(self.currentUI, (768, 0))
 		self.fps = self.Clock.get_fps()
-		self.Clock.tick(self.FPS)
 		caption = 'Fps: ' + str(math.floor(self.fps)) + ' | Player:(' + str(self.player.currentX/32) + ',' + str(self.player.currentY/32) + ')  | ZombieCount ' + str(len(self.zombies)) + ' | Firing speed: ' + str(self.firingTimer.seconds)
 		pygame.display.set_caption(caption)
 		pygame.display.flip()
+		self.Clock.tick(self.FPS)
 	
 	def updateUI(self):
 		self.currentUI.blit(self.uiBackground.sprite, (0,0))
@@ -151,7 +161,11 @@ while game.gamestate == 'ingame':
 	
 	
 	while game.gamestate == 'ingame':
-		game.updateIngame()
+		game.currentTime = time.time()
+		if game.currentTime - game.lastTick >= game.deltaTick:
+			game.updateLogic()
+			game.lastTick = time.time()
+		game.updateRender()
 		game.updateUI()
 		
 	if game.gamestate == 'dead':
